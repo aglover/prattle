@@ -1,0 +1,44 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+sourceSets {
+    main {
+        java { srcDirs = [] }    // no source dirs for the java compiler
+        groovy { srcDirs += ["src/main/java", "src/main/groovy"] }  // compile everything in src/ with groovy
+    }
+}
+
+buildscript {
+    project.ext {
+        name = 'prattle'
+        ver = '1.0'
+    }
+}
+
+jar {
+    baseName = project.name
+    version = project.ver
+}
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    systemProperty 'hipchat.token', hipchatToken
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.2.0'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.6'
+    compile 'com.netflix.rxjava:rxjava-core:0.16.1'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile 'com.jayway.awaitility:awaitility-groovy:1.4.0'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
