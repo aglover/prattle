@@ -16,7 +16,7 @@ class Prattle {
         "${url}?auth_token=${encode(this.token)}"
     }
 
-    def private doGet(String url, Closure closure) {
+    private def doGet(String url, Closure closure) {
         def response = new RESTClient(secureURL(url))
                 .get(contentType: JSON, requestContentType: JSON)
         return closure.call(response)
