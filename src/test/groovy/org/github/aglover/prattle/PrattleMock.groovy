@@ -8,6 +8,11 @@ class PrattleMock extends Prattle {
     }
 
     @Override
+    Integer sendMessage(Integer userId, String message) {
+        return 204
+    }
+
+    @Override
     List<User> allParticipantsIn(final String address) {
         [new User(id: 568915, name: "Andrew Glover", mention: "AndrewGlover"),
                 new User(id: 334670, name: "Cameron Fieber", mention: "cfieber")]

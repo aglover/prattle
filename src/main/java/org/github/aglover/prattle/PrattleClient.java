@@ -106,4 +106,24 @@ public class PrattleClient {
             }
         });
     }
+
+    public Observable<Integer> sendMessage(final Integer userId, final String message) {
+        return Observable.create(new Observable.OnSubscribeFunc<Integer>() {
+            @Override
+            public Subscription onSubscribe(final Observer<? super Integer> Observer) {
+                pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Observer.onNext(prattle.sendMessage(userId, message));
+                            Observer.onCompleted();
+                        } catch (Throwable thr) {
+                            Observer.onError(thr);
+                        }
+                    }
+                });
+                return Subscriptions.empty();
+            }
+        });
+    }
 }

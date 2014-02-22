@@ -84,6 +84,21 @@ class PrattleClientSpec extends Specification {
         await().atMost(2, SECONDS).until { answer == 204 }
     }
 
+    def "Sending a private message should result in a 204 status from hipchat"() {
+        def prattle = new PrattleClient(new PrattleMock())
+
+        def answer = 0
+        expect:
+        prattle.sendMessage(568915, "Hello, Andy, from Async RxJava").subscribe(new Action1<Integer>() {
+            @Override
+            void call(Integer integer) {
+                answer = integer
+            }
+        })
+
+        await().atMost(2, SECONDS).until { answer == 204 }
+    }
+
     def "it should return a list of users for a room non-Rx"() {
         def prattle = new PrattleMock()
         def list = prattle.allParticipantsIn("Cloud Interface Tools")

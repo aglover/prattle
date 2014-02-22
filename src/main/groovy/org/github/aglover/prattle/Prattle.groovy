@@ -14,7 +14,7 @@ class Prattle {
     }
 
     protected String secureURL(String url) {
-        if(this.token == null || this.token.equals("")){
+        if (this.token == null || this.token.equals("")) {
             throw new TokenNotProvidedException("You must provide a HipChat token!")
         }
         "${url}?auth_token=${encode(this.token)}"
@@ -26,9 +26,17 @@ class Prattle {
         return closure.call(response)
     }
 
+    private Integer doPost(String url) {
+        new RESTClient(secureURL(url)).post(contentType: JSON, requestContentType: JSON,
+                body: [message: message]).status
+    }
+
     Integer sendMessage(final String room, final String message) {
-        new RESTClient(secureURL("https://api.hipchat.com/v2/room/${encode(room)}/notification"))
-                .post(contentType: JSON, requestContentType: JSON, body: [message: message]).status
+        doPost("https://api.hipchat.com/v2/room/${encode(room)}/notification")
+    }
+
+    Integer sendMessage(final Integer userId, final String message) {
+        doPost("https://api.hipchat.com/v2/user/${encode(userId)}/message")
     }
 
     User getUser(final Integer id) {
