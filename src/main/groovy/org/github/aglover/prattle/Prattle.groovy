@@ -1,6 +1,7 @@
 package org.github.aglover.prattle
 
 import groovyx.net.http.RESTClient
+import org.github.aglover.prattle.exception.TokenNotProvidedException
 
 import static groovyx.net.http.ContentType.JSON
 
@@ -13,6 +14,9 @@ class Prattle {
     }
 
     protected String secureURL(String url) {
+        if(this.token == null){
+            throw new TokenNotProvidedException("You must provide a HipChat token!")
+        }
         "${url}?auth_token=${encode(this.token)}"
     }
 

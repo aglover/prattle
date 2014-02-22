@@ -2,6 +2,7 @@ package org.github.aglover.prattle
 
 import com.jayway.awaitility.groovy.AwaitilitySupport
 import groovyx.net.http.RESTClient
+import org.github.aglover.prattle.exception.TokenNotProvidedException
 import rx.util.functions.Action1
 import rx.util.functions.Func1
 import spock.lang.Specification
@@ -11,6 +12,17 @@ import static java.util.concurrent.TimeUnit.SECONDS
 
 @Mixin(AwaitilitySupport)
 class PrattleClientSpec extends Specification {
+
+    def "an exception should be thrown if no token is provided"() {
+        setup:
+        def client = new Prattle()
+
+        when:
+        client.allMembersOf("some room")
+
+        then:
+        thrown TokenNotProvidedException
+    }
 
     def "it should get a 202 for auth test"() {
         def token = new URLEncoder().encode(System.properties["hipchat.token"], "UTF-8")
