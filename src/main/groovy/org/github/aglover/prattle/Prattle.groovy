@@ -14,7 +14,7 @@ class Prattle {
     }
 
     protected String secureURL(String url) {
-        if(this.token == null){
+        if(this.token == null || this.token.equals("")){
             throw new TokenNotProvidedException("You must provide a HipChat token!")
         }
         "${url}?auth_token=${encode(this.token)}"

@@ -12,6 +12,8 @@ public class PrattleClient {
     private final ExecutorService pool = Executors.newFixedThreadPool(10);
     private Prattle prattle;
 
+    private PrattleClient() {}
+
     public PrattleClient(final Prattle prattle) {
         this.prattle = prattle;
     }

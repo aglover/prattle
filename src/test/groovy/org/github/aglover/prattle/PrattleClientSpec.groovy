@@ -24,6 +24,17 @@ class PrattleClientSpec extends Specification {
         thrown TokenNotProvidedException
     }
 
+    def "an exception should be thrown if blank token is provided"() {
+        setup:
+        def client = new Prattle(token: "")
+
+        when:
+        client.allMembersOf("some room")
+
+        then:
+        thrown TokenNotProvidedException
+    }
+
     def "it should get a 202 for auth test"() {
         def token = new URLEncoder().encode(System.properties["hipchat.token"], "UTF-8")
         def url = "https://api.hipchat.com/v2/room?auth_token=${token}&auth_test=true"
