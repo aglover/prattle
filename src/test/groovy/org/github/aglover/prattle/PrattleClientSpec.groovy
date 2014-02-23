@@ -24,6 +24,27 @@ class PrattleClientSpec extends Specification {
         thrown TokenNotProvidedException
     }
 
+    def "an exception should be thrown if blank token is provided to Java client"() {
+        setup:
+        def client = new PrattleClient("")
+        def errorMessage = ""
+
+        expect:
+        client.members("Cloud Interface Tools").doOnError(new Action1<Throwable>() {
+            @Override
+            void call(Throwable throwable) {
+                errorMessage = throwable.getMessage()
+            }
+        }).count().subscribe(new Action1<Integer>() {
+            @Override
+            void call(Integer integer) {}
+        })
+
+        await().atMost(2, SECONDS).until {
+            errorMessage == "You must provide a HipChat token!"
+        }
+    }
+
     def "an exception should be thrown if blank token is provided"() {
         setup:
         def client = new Prattle(token: "")
