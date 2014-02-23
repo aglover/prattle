@@ -71,8 +71,8 @@ class PrattleClientSpec extends Specification {
         def prattle = new PrattleMock()
 
         expect:
-        def res = prattle.getUser(568915)
-        res.name == "Andrew Glover"
+        def res = prattle.getUser(568999)
+        res.name == "Andrew Smith"
     }
 
     def "it should return a user Rx"() {
@@ -80,20 +80,20 @@ class PrattleClientSpec extends Specification {
         def name = ""
 
         expect:
-        prattle.getUser(568915).subscribe(new Action1<User>() {
+        prattle.getUser(568999).subscribe(new Action1<User>() {
             @Override
             void call(User user) {
                 name = user.name
             }
         })
 
-        await().atMost(2, SECONDS).until { name == "Andrew Glover" }
+        await().atMost(2, SECONDS).until { name == "Andrew Smith" }
     }
 
     def "Sending a message should result in a 204 status from hipchat"() {
         def prattle = new PrattleClient(new PrattleMock())
-
         def answer = 0
+
         expect:
         prattle.sendMessage("Cloud Interface Tools", "Hello from Async RxJava").subscribe(new Action1<Integer>() {
             @Override
@@ -107,10 +107,10 @@ class PrattleClientSpec extends Specification {
 
     def "Sending a private message should result in a 204 status from hipchat"() {
         def prattle = new PrattleClient(new PrattleMock())
-
         def answer = 0
+
         expect:
-        prattle.sendMessage(568915, "Hello, Andy, from Async RxJava").subscribe(new Action1<Integer>() {
+        prattle.sendMessage(568999, "Hello, Andy, from Async RxJava").subscribe(new Action1<Integer>() {
             @Override
             void call(Integer integer) {
                 answer = integer
@@ -170,7 +170,7 @@ class PrattleClientSpec extends Specification {
         prattle.participants("Cloud Interface Tools").filter(new Func1<User, Boolean>() {
             @Override
             Boolean call(User user) {
-                return user.name.equalsIgnoreCase("Andrew Glover")
+                return user.name.equalsIgnoreCase("Andrew Smith")
             }
         }).subscribe(new Action1<User>() {
             @Override
@@ -178,7 +178,7 @@ class PrattleClientSpec extends Specification {
                 expect = iUser
             }
         })
-        await().atMost(2, SECONDS).until { expect.id == 568915 }
+        await().atMost(2, SECONDS).until { expect.id == 568999 }
     }
 
     def "it should get all members of a room rx"() {

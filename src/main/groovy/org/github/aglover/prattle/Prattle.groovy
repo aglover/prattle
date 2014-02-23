@@ -13,20 +13,20 @@ class Prattle {
         new URLEncoder().encode(value, "UTF-8").replace('+', '%20')
     }
 
-    protected String secureURL(String url) {
+    protected String secureURL(final String url) {
         if (this.token == null || this.token.equals("")) {
             throw new TokenNotProvidedException("You must provide a HipChat token!")
         }
         "${url}?auth_token=${encode(this.token)}"
     }
 
-    private def doGet(String url, Closure closure) {
+    private def doGet(final String url, final Closure closure) {
         def response = new RESTClient(secureURL(url))
                 .get(contentType: JSON, requestContentType: JSON)
         return closure.call(response)
     }
 
-    private Integer doPost(String url) {
+    private Integer doPost(final String url) {
         new RESTClient(secureURL(url)).post(contentType: JSON, requestContentType: JSON,
                 body: [message: message]).status
     }
