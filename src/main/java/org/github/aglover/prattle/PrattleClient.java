@@ -25,106 +25,72 @@ public class PrattleClient {
     }
 
     public Observable<User> getUser(final Integer id) {
-        return Observable.create(new Observable.OnSubscribeFunc<User>() {
+        return Observable.create(new AsyncOnSubscribeFunction<User>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super User> Observer) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Observer.onNext(prattle.getUser(id));
-                            Observer.onCompleted();
-                        } catch (Throwable thr) {
-                            Observer.onError(thr);
-                        }
-                    }
-                });
-                return Subscriptions.empty();
+            void handleOnNext(final Observer<? super User> observer) {
+                observer.onNext(prattle.getUser(id));
             }
         });
     }
 
     public Observable<User> members(final String room) {
-        return Observable.create(new Observable.OnSubscribeFunc<User>() {
+        return Observable.create(new AsyncOnSubscribeFunction<User>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super User> Observer) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (User user : prattle.allMembersOf(room)) {
-                                Observer.onNext(user);
-                            }
-                            Observer.onCompleted();
-                        } catch (Throwable thr) {
-                            Observer.onError(thr);
-                        }
-                    }
-                });
-                return Subscriptions.empty();
+            void handleOnNext(final Observer<? super User> observer) {
+                for (final User user : prattle.allMembersOf(room)) {
+                    observer.onNext(user);
+                }
             }
         });
     }
 
     public Observable<User> participants(final String room) {
-        return Observable.create(new Observable.OnSubscribeFunc<User>() {
+        return Observable.create(new AsyncOnSubscribeFunction<User>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super User> Observer) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (User user : prattle.allParticipantsIn(room)) {
-                                Observer.onNext(user);
-                            }
-                            Observer.onCompleted();
-                        } catch (Throwable thr) {
-                            Observer.onError(thr);
-                        }
-                    }
-                });
-                return Subscriptions.empty();
+            void handleOnNext(final Observer<? super User> observer) {
+                for (final User user : prattle.allParticipantsIn(room)) {
+                    observer.onNext(user);
+                }
             }
         });
     }
 
     public Observable<Integer> sendMessage(final String room, final String message) {
-        return Observable.create(new Observable.OnSubscribeFunc<Integer>() {
+        return Observable.create(new AsyncOnSubscribeFunction<Integer>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super Integer> Observer) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Observer.onNext(prattle.sendMessage(room, message));
-                            Observer.onCompleted();
-                        } catch (Throwable thr) {
-                            Observer.onError(thr);
-                        }
-                    }
-                });
-                return Subscriptions.empty();
+            void handleOnNext(final Observer<? super Integer> observer) {
+                observer.onNext(prattle.sendMessage(room, message));
             }
         });
     }
 
     public Observable<Integer> sendMessage(final Integer userId, final String message) {
-        return Observable.create(new Observable.OnSubscribeFunc<Integer>() {
+        return Observable.create(new AsyncOnSubscribeFunction<Integer>() {
             @Override
-            public Subscription onSubscribe(final Observer<? super Integer> Observer) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Observer.onNext(prattle.sendMessage(userId, message));
-                            Observer.onCompleted();
-                        } catch (Throwable thr) {
-                            Observer.onError(thr);
-                        }
-                    }
-                });
-                return Subscriptions.empty();
+            void handleOnNext(final Observer<? super Integer> observer) {
+                observer.onNext(prattle.sendMessage(userId, message));
             }
         });
+    }
+
+    abstract class AsyncOnSubscribeFunction<T> implements Observable.OnSubscribeFunc<T> {
+
+        abstract void handleOnNext(final Observer<? super T> observer);
+
+        @Override
+        public Subscription onSubscribe(final Observer<? super T> observer) {
+            pool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        handleOnNext(observer);
+                        observer.onCompleted();
+                    } catch (final Throwable thr) {
+                        observer.onError(thr);
+                    }
+                }
+            });
+            return Subscriptions.empty();
+        }
     }
 }
